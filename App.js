@@ -1,36 +1,60 @@
-import * as React from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
 
-const instructions = Platform.select({
-  ios: `Press Cmd+R to reload,\nCmd+D or shake for dev menu`,
-  android: `Double tap R on your keyboard to reload,\nShake or press menu button for dev menu`,
-});
+import React from 'react';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
+import Home from './components/Home';
+import PostCreate from './components/PostCreate';
+import PostDetails from './components/PostDetails';
+import PostEdit from './components/PostEdit';
+import Posts from './components/Posts';
+
+const Drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.welcome}>Welcome to React Native!</Text>
-      <Text style={styles.instructions}>To get started, edit App.js</Text>
-      <Text style={styles.instructions}>{instructions}</Text>
-    </View>
+    <NavigationContainer>
+      <Drawer.Navigator>
+        <Drawer.Screen name="Home" component={HomeScreen}></Drawer.Screen>
+        <Drawer.Screen name="Posts" component={PostsScreen}></Drawer.Screen>
+      </Drawer.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+const styleOptions = {
+  headerStyle: {
+    backgroundColor: '#3CB371',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  headerTintColor: '#000000'
+};
+
+const options = ({ navigation }) => ({
+  headerLeft: () => (
+    <Icon style={{marginLeft: 16}} name='bars' size={30} onPress={() => navigation.openDrawer()}></Icon>
+  ),
+  ...styleOptions
 });
+
+function HomeScreen() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name='Home' component={Home} options={options}></Stack.Screen>
+    </Stack.Navigator>
+  );
+}
+
+function PostsScreen() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name='Posts' component={Posts} options={options}></Stack.Screen>
+      <Stack.Screen name='PostDetails' component={PostDetails} options={styleOptions}></Stack.Screen>
+      <Stack.Screen name='PostCreate' component={PostCreate} options={styleOptions}></Stack.Screen>
+      <Stack.Screen name='PostEdit' component={PostEdit} options={styleOptions}></Stack.Screen>
+    </Stack.Navigator>
+  );
+}
