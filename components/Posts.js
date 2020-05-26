@@ -1,8 +1,9 @@
 import React from 'react';
-import { ActivityIndicator, FlatList, ImageBackground, Picker, Platform, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, ImageBackground, Picker, Platform, StyleSheet, Switch, Text, TouchableOpacity, View, Alert } from 'react-native';
 import { data } from '../data';
 import reactnativelogo from '../images/reactnativelogo.png';
 import Post from './Post';
+import CustomAlert from './CustomAlert';
 
 export default class Posts extends React.Component {
   constructor(props) {
@@ -25,6 +26,9 @@ export default class Posts extends React.Component {
     this.posts.sort(this.sortByVotes);
 
     this.state = { 
+      alert: {
+        visible: false
+      },
       imageBackground: false,
       loading: true,
       pickerValue: 'votes',
@@ -36,6 +40,43 @@ export default class Posts extends React.Component {
       this.setState({ loading: false });
     }, 2000);
   }
+
+  showAlert = (message, post) => {
+    switch (Platform.OS) {
+      case 'web': 
+        this.setState({ 
+          alert: {
+            visible: true,
+            message: message,
+            postToDelete: post
+          } 
+        });
+        break;
+      case 'android': 
+      case 'ios':
+        Alert.alert(
+          '',
+          'Are you sure to delete ' + post.title + '?',
+          [
+            {text: 'Cancel'},
+            {text: 'Confirm', onPress: () => this.deletePost(post)},
+          ]
+        );
+        break;
+    }
+  };
+
+  closeAlert = (confirm) => {
+    this.setState({
+      alert: {
+        visible: false
+      }
+    });
+
+    if (confirm) {
+      this.deletePost(this.state.alert.postToDelete);
+    }
+  };
 
   updatePicker = (value) => {
     let posts = Object.assign([], this.state.posts);
@@ -101,6 +142,7 @@ export default class Posts extends React.Component {
     } else {
       const body = (
         <>
+          {this.state.alert.visible && <CustomAlert message={this.state.alert.message} onClose={this.closeAlert}></CustomAlert>}
           <View style={styles.pickerContainer}>
             <Text style={styles.pickerLabel}>Sort by </Text>
             <Picker style={styles.picker} itemStyle={styles.pickerItem} selectedValue={this.state.pickerValue} onValueChange={(value, index) => this.updatePicker(value)}>
@@ -108,7 +150,7 @@ export default class Posts extends React.Component {
               <Picker.Item label='date' value='date'></Picker.Item>
             </Picker>
           </View>
-          <FlatList data={this.state.posts} extraData={this.state.posts} renderItem={({item}) => <Post navigation={this.props.navigation} post={item} onEdit={this.editPost} onDelete={this.deletePost}></Post>} keyExtractor={item => item.id.toString()}></FlatList>
+          <FlatList data={this.state.posts} extraData={this.state.posts} renderItem={({item}) => <Post navigation={this.props.navigation} post={item} onEdit={this.editPost} showAlert={this.showAlert}></Post>} keyExtractor={item => item.id.toString()}></FlatList>
           <View style={styles.imageBackgroundContainer}>
             <Switch trackColor={{ false: "#FFFFFF", true: "#FFFFFF" }} ios_backgroundColor='#FFFFFF' thumbColor={this.state.imageBackground ? "#3CB371" : "#AAAAAA"} value={this.state.imageBackground} onValueChange={() => this.setState({ imageBackground: !this.state.imageBackground })}></Switch>
             <Text style={[styles.imageBackgroundLabel, this.state.imageBackground ? styles.white : styles.black]}>Image background</Text>

@@ -5,13 +5,8 @@ import Voting from './Voting';
 export default class Info extends React.Component {  
   constructor(props) {
     super(props);
-
     const info = this.props.info;
-
-    this.state = {
-      info,
-      date: info.date.getDate() + '/' + (info.date.getMonth().toString().length === 1 ? '0' : '') + (info.date.getMonth() + 1) + '/' + info.date.getFullYear()
-    };
+    this.state = { info, date: info.date.getDate() + '/' + (info.date.getMonth().toString().length === 1 ? '0' : '') + (info.date.getMonth() + 1) + '/' + info.date.getFullYear() };
   }
 
   render() {

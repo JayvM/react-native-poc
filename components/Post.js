@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Info from './Info';
 
@@ -23,16 +23,7 @@ export default class Post extends React.Component {
           post: this.state.post,
           onEdit: (post) => this.props.onEdit(post)
         })}
-        onLongPress={() => {
-          Alert.alert(
-            '',
-            'Are you sure to delete ' + this.state.post.title + '?',
-            [
-              {text: 'Cancel'},
-              {text: 'Confirm', onPress: () => this.props.onDelete(this.state.post)},
-            ]
-          );
-        }}
+        onLongPress={() => this.props.showAlert('Are you sure to delete ' + this.state.post.title + '?', this.state.post)}
       >
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{this.state.post.title}</Text>

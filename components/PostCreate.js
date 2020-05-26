@@ -1,7 +1,47 @@
 import React from 'react';
 import { Alert, Button, Platform, StyleSheet, Text, TextInput, ToastAndroid, View } from 'react-native';
+import CustomAlert from './CustomAlert';
 
 export default class PostCreate extends React.Component {  
+  constructor(props) {
+    super(props);
+
+    this.props.navigation.setOptions({ title: 'Create post' });
+
+    this.state = {
+      alert: {
+        visible: false
+      }
+    }
+  }
+
+  showAlert = (message) => {
+    switch (Platform.OS) {
+      case 'web': 
+        this.setState({ 
+          alert: {
+            visible: true,
+            message: message
+          } 
+        });
+        break;
+      case 'android': 
+        ToastAndroid.show(message, ToastAndroid.SHORT);
+        break;
+      case 'ios':
+        Alert.alert(message);
+        break;
+    }
+  };
+
+  closeAlert = () => {
+    this.setState({
+      alert: {
+        visible: false
+      }
+    });
+  };
+
   validate() {
     if (this.state && this.state.title && this.state.content) {
       const post = {
@@ -18,21 +58,14 @@ export default class PostCreate extends React.Component {
       this.props.route.params.onCreate(post);
       this.props.navigation.goBack();
     } else {
-      if (Platform.OS === 'android') {
-        ToastAndroid.show("Fill in all inputs!", ToastAndroid.SHORT);
-      } 
-
-      if (Platform.OS === 'ios') {
-        Alert.alert('Fill in all inputs!');
-      }
+      this.showAlert('Fill in all inputs!');
     }
   }
 
   render() {
-    this.props.navigation.setOptions({ title: 'Create post' });
-
     return (
       <View style={styles.container}>
+        {this.state.alert.visible && <CustomAlert message={this.state.alert.message} onClose={this.closeAlert}></CustomAlert>}
         <Text style={styles.label}>Title</Text>
         <TextInput style={styles.input} onChangeText={(value) => this.setState({title: value})}></TextInput>
         <Text style={styles.label}>Content</Text>
